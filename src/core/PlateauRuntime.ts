@@ -333,15 +333,29 @@ export async function createPlateauRuntime(
   });
 
   tileset.onTileVisibilityChanged((handle, visible) => {
+    const uri = handle.tile_content_uri;
     let changed = false;
     if (visible) {
-      if (!visibleUris.has(handle.tile_content_uri)) {
-        visibleUris.add(handle.tile_content_uri);
-        styleCache.retain(handle.tile_content_uri);
+      if (!visibleUris.has(uri)) {
+        visibleUris.add(uri);
+        styleCache.retain(uri);
         changed = true;
       }
-    } else if (visibleUris.delete(handle.tile_content_uri)) {
-      styleCache.release(handle.tile_content_uri);
+      // Resilient retry: if the tile reached "visible" without being styled
+      // (e.g. an earlier rebuildTile bailed because tileAlive went false
+      // mid-flight while the camera was reframing), trigger a fresh rebuild.
+      const entry = tiles.get(uri);
+      if (
+        entry &&
+        entry.handle.featureIdAttribute &&
+        !entry.colorTexture &&
+        entry.handle.state !== 'featureIdMissing' &&
+        entry.handle.state !== 'styleRequested'
+      ) {
+        void rebuildTile(entry);
+      }
+    } else if (visibleUris.delete(uri)) {
+      styleCache.release(uri);
       changed = true;
     }
     if (changed) emitVisibleTiles();

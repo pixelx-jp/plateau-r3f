@@ -26,13 +26,13 @@
 - Polished UI: glassmorphism control panel (city / colorBy / hazard), loading spinner, brand chip.
 - `?city=<id>` URL param for shareable views.
 
-### Known issues (0.1.x demo)
+### 0.1.1 — Resilient styling on big cities
 
-- Minato (32k buildings) and Kamakura (69k) sometimes load with some
-  buildings rendered in raw 3D Tiles material instead of styled. Suspected
-  race between AutoFit camera reframing and 3D Tiles LOD eviction causing
-  rebuildTile to skip patching on re-loaded meshes. Chiyoda always renders
-  correctly. Fix tracked for 0.2.
+- Fix a race where `rebuildTile` could bail mid-flight (camera reframing
+  caused 3D Tiles to evict a tile while its style arrow was still
+  fetching), leaving the re-loaded mesh unstyled. The visibility callback
+  now retries `rebuildTile` for any visible tile without a color texture.
+  Minato (32k buildings) and Kamakura (69k) now render with full styling.
 
 ### Plan-conformance fixes (post-review)
 
