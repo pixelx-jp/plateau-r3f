@@ -1,6 +1,6 @@
 # API reference
 
-Top-level exports of `@plateau/r3f`:
+Top-level exports of `@yodolabs/plateau-r3f`:
 
 | group | exports |
 | --- | --- |

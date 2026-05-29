@@ -1,4 +1,4 @@
-# Contributing to @plateau/r3f
+# Contributing to @yodolabs/plateau-r3f
 
 ## Setup
 

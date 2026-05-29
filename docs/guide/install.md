@@ -1,11 +1,11 @@
 # Install
 
 ```sh
-npm i @plateau/r3f three @react-three/fiber
+npm i @yodolabs/plateau-r3f three @react-three/fiber
 # or
-pnpm add @plateau/r3f three @react-three/fiber
+pnpm add @yodolabs/plateau-r3f three @react-three/fiber
 # or
-yarn add @plateau/r3f three @react-three/fiber
+yarn add @yodolabs/plateau-r3f three @react-three/fiber
 ```
 
 `three` and `@react-three/fiber` are **peer dependencies** — pick versions compatible with your app.

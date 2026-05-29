@@ -1,6 +1,6 @@
 # Overview
 
-`@plateau/r3f` is a React Three Fiber library that consumes the artifacts produced by `plateau-core`:
+`@yodolabs/plateau-r3f` is a React Three Fiber library that consumes the artifacts produced by `plateau-core`:
 
 ```
 out_<city>/

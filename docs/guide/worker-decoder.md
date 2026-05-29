@@ -3,10 +3,10 @@
 Most cities decode in <100 µs per tile, so the default main-thread decoder is fine. For very large tiles (>10k rows) or scenes that exhaust your main-thread budget, plug a Worker-backed decoder:
 
 ```ts
-import { Plateau, createWorkerStyleDecoder } from '@plateau/r3f';
+import { Plateau, createWorkerStyleDecoder } from '@yodolabs/plateau-r3f';
 
 // Vite: ?worker import. Other bundlers — see their docs.
-import StyleWorker from '@plateau/r3f/dist/styleWorker?worker';
+import StyleWorker from '@yodolabs/plateau-r3f/dist/styleWorker?worker';
 
 const worker = new StyleWorker();
 const decoder = createWorkerStyleDecoder(worker);

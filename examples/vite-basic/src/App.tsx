@@ -9,7 +9,7 @@ import {
   type BuiltinColorBy,
   type HazardType,
   type PlateauRuntimeApi,
-} from '@plateau/r3f';
+} from '@yodolabs/plateau-r3f';
 
 function DebugBridge() {
   const { scene, camera, gl } = useThree();
@@ -141,7 +141,7 @@ export default function App() {
     <>
       <div className="brand">
         <span className="dot" />
-        <span className="name">@plateau/r3f</span>
+        <span className="name">@yodolabs/plateau-r3f</span>
         <span className="pkg">demo</span>
       </div>
 
@@ -213,7 +213,7 @@ export default function App() {
         <div className="links">
           Built with{' '}
           <a href="https://github.com/pixelx-jp/plateau-r3f" target="_blank" rel="noreferrer">
-            @plateau/r3f
+            @yodolabs/plateau-r3f
           </a>
           <span className="sep">·</span>
           <a href="https://pixelx-jp.github.io/plateau-r3f/" target="_blank" rel="noreferrer">

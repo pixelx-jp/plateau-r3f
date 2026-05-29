@@ -7,7 +7,7 @@ import {
   FallbackExtrusionLayer,
   type FallbackPolicy,
   type PlateauRuntimeApi,
-} from '@plateau/r3f';
+} from '@yodolabs/plateau-r3f';
 
 function DebugBridge() {
   const { scene, camera, gl } = useThree();

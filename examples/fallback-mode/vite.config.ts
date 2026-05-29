@@ -59,7 +59,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@plateau/r3f': path.resolve(__dirname, '../../src/index.ts'),
+      '@yodolabs/plateau-r3f': path.resolve(__dirname, '../../src/index.ts'),
     },
     dedupe: ['three', 'react', 'react-dom'],
   },

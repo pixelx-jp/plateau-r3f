@@ -4,7 +4,7 @@ Mount extra GLSL into the patched per-tile material via `shaderExtensions`. Each
 
 ```ts
 import * as THREE from 'three';
-import { Plateau, type ShaderExtension } from '@plateau/r3f';
+import { Plateau, type ShaderExtension } from '@yodolabs/plateau-r3f';
 
 const rimLight: ShaderExtension = {
   id: 'rim-light',

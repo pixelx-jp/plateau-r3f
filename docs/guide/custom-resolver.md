@@ -3,7 +3,7 @@
 The default resolver assumes `<baseUrl>/<city>/manifest.json` etc. Override it for non-standard layouts:
 
 ```ts
-import { Plateau, type ArtifactResolver } from '@plateau/r3f';
+import { Plateau, type ArtifactResolver } from '@yodolabs/plateau-r3f';
 
 const resolver: ArtifactResolver = {
   resolve(city) {

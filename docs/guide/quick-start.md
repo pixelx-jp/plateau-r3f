@@ -3,7 +3,7 @@
 ```tsx
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Plateau, HazardLayer } from '@plateau/r3f';
+import { Plateau, HazardLayer } from '@yodolabs/plateau-r3f';
 
 export default function App() {
   return (

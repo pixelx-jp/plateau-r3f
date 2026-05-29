@@ -20,7 +20,7 @@ Set the policy on `<Plateau fallback="...">`:
 The runtime resolves to a concrete `FallbackMode` automatically. Mount `<FallbackExtrusionLayer>` inside `<Plateau>` to have the PMTiles path auto-mount when the mode is `level-2-pmtiles-extruded` or `level-3-pmtiles-flat`.
 
 ```tsx
-import { Plateau, FallbackExtrusionLayer } from '@plateau/r3f';
+import { Plateau, FallbackExtrusionLayer } from '@yodolabs/plateau-r3f';
 
 <Plateau city="..." fallback="auto">
   <FallbackExtrusionLayer />

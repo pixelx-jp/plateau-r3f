@@ -6,7 +6,7 @@
   <img src=".github/assets/yodo-labs-logo.png" width="120" alt="Yodo Labs" />
 </p>
 
-<h1 align="center">@plateau/r3f</h1>
+<h1 align="center">@yodolabs/plateau-r3f</h1>
 
 <p align="center">
   <b>PLATEAU 3D Tiles for React Three Fiber.</b><br/>
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@plateau/r3f"><img alt="npm" src="https://img.shields.io/npm/v/@plateau/r3f?color=000"/></a>
+  <a href="https://www.npmjs.com/package/@yodolabs/plateau-r3f"><img alt="npm" src="https://img.shields.io/npm/v/@yodolabs/plateau-r3f?color=000"/></a>
   <a href="./LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-000"/></a>
   <a href="https://github.com/pixelx-jp/plateau-r3f/actions/workflows/ci.yml"><img alt="ci" src="https://github.com/pixelx-jp/plateau-r3f/actions/workflows/ci.yml/badge.svg"/></a>
   <img alt="bundle" src="https://img.shields.io/badge/bundle-~64KB%20ESM-000"/>
@@ -45,7 +45,7 @@ Japan's [Project PLATEAU](https://www.mlit.go.jp/plateau/) ships open 3D city mo
 ## Install
 
 ```sh
-npm i @plateau/r3f three @react-three/fiber
+npm i @yodolabs/plateau-r3f three @react-three/fiber
 ```
 
 ## Quick start
@@ -53,7 +53,7 @@ npm i @plateau/r3f three @react-three/fiber
 ```tsx
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Plateau, HazardLayer } from '@plateau/r3f';
+import { Plateau, HazardLayer } from '@yodolabs/plateau-r3f';
 
 export default function App() {
   return (

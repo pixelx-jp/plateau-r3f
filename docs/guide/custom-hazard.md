@@ -3,7 +3,7 @@
 `registerHazardLayer` declares a new hazard type and its field bindings:
 
 ```ts
-import { registerHazardLayer, HazardLayer } from '@plateau/r3f';
+import { registerHazardLayer, HazardLayer } from '@yodolabs/plateau-r3f';
 
 registerHazardLayer({
   type: 'heat_island',

@@ -3,7 +3,7 @@
 `<Plateau>` is the React wrapper around `PlateauRuntime`. Build a runtime directly when you need lifecycle control outside React (e.g. headless processing, custom orchestration).
 
 ```ts
-import { createPlateauRuntime } from '@plateau/r3f';
+import { createPlateauRuntime } from '@yodolabs/plateau-r3f';
 
 const runtime = await createPlateauRuntime({
   city: 'chiyoda',
