@@ -19,6 +19,13 @@
 - Regression test for sparse `tile_feature_id` (non-contiguous ids, e.g. 0 / 5 / 380).
 - GitHub Actions: CI on push/PR (typecheck + test + build + pack), Release workflow on `v*` tags (auto `npm publish --provenance`).
 
+### Live demo
+
+- Deployed at https://plateau-r3f-demo.pages.dev (Cloudflare Pages + R2).
+- Multi-city: Chiyoda · Minato · Kamakura, with one-click switcher.
+- Polished UI: glassmorphism control panel (city / colorBy / hazard), loading spinner, brand chip.
+- `?city=<id>` URL param for shareable views.
+
 ### Plan-conformance fixes (post-review)
 
 - Extracted `core/TileLifecycle.ts` with `canTransition()` state-machine helper.

@@ -17,7 +17,7 @@ page.on('response', (r) => {
 });
 page.on('requestfailed', (r) => fails.push(`${r.failure()?.errorText} ${r.url().slice(0, 100)}`));
 await page.goto('https://plateau-r3f-demo.pages.dev/', { waitUntil: 'domcontentloaded' });
-await page.waitForTimeout(30000);
+await page.waitForTimeout(45000);
 console.log('=== unique URL patterns (deduped by prefix) ===');
 const seen = new Set();
 for (const r of reqs) {

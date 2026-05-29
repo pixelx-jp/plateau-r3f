@@ -3,23 +3,121 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plateau-r3f vite-basic</title>
+    <title>@plateau/r3f — live demo</title>
+    <meta name="description" content="React Three Fiber library for PLATEAU 3D Tiles. Live demo by Yodo Labs." />
+    <meta property="og:title" content="@plateau/r3f — live demo" />
+    <meta property="og:description" content="PLATEAU 3D city models in the browser with per-building coloring and hazard overlays." />
+    <meta property="og:url" content="https://plateau-r3f-demo.pages.dev/" />
     <style>
-      html, body, #root { height: 100%; margin: 0; background: #0a0a0a; color: #eee; font-family: system-ui, sans-serif; }
-      .hud {
-        position: fixed; top: 12px; left: 12px; z-index: 10;
-        background: rgba(0,0,0,0.6); padding: 8px 10px; border-radius: 6px;
+      :root {
+        --bg: #0b0d11;
+        --fg: #e8e9eb;
+        --muted: #8b8f96;
+        --panel: rgba(13, 16, 22, 0.78);
+        --panel-border: rgba(255, 255, 255, 0.08);
+        --accent: #5cc8ff;
+      }
+      html, body, #root {
+        height: 100%; margin: 0;
+        background: var(--bg); color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      /* Loading overlay shown until the runtime is ready */
+      .loading {
+        position: fixed; inset: 0; z-index: 50;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 12px;
+        background: var(--bg);
+        transition: opacity 0.4s ease;
+      }
+      .loading.hidden { opacity: 0; pointer-events: none; }
+      .loading .spinner {
+        width: 28px; height: 28px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      .loading .label { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* Top-left brand chip */
+      .brand {
+        position: fixed; top: 14px; left: 14px; z-index: 12;
+        display: flex; align-items: center; gap: 10px;
+        font-size: 13px; font-weight: 500;
+        color: var(--fg);
+      }
+      .brand .dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent);
+      }
+      .brand .name { letter-spacing: 0.02em; }
+      .brand .pkg { color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+
+      /* Control panel */
+      .panel {
+        position: fixed; top: 14px; right: 14px; z-index: 10;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        min-width: 220px;
         font-size: 13px;
       }
-      .hud select { background: #222; color: #eee; border: 1px solid #444; }
-      .attr {
-        position: fixed; bottom: 8px; left: 8px; right: 8px;
-        text-align: center; font-size: 11px; opacity: 0.6;
+      .panel h2 {
+        margin: 0 0 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
       }
+      .panel .row {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px;
+        margin: 8px 0;
+      }
+      .panel label { color: var(--muted); font-size: 12px; }
+      .panel select {
+        background: #1a1d23;
+        color: var(--fg);
+        border: 1px solid var(--panel-border);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 12px;
+        font-family: inherit;
+        min-width: 130px;
+      }
+      .panel select:hover { border-color: rgba(255,255,255,0.2); }
+      .panel select:focus { outline: none; border-color: var(--accent); }
+
+      /* Footer attribution */
+      .attr {
+        position: fixed; bottom: 10px; left: 10px; right: 10px; z-index: 10;
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+      .attr .links { margin-top: 2px; }
+      .attr .links a { color: var(--muted); }
+      .attr .sep { margin: 0 6px; opacity: 0.4; }
     </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div class="label">loading plateau</div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
