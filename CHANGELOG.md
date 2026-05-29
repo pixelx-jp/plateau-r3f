@@ -26,6 +26,14 @@
 - Polished UI: glassmorphism control panel (city / colorBy / hazard), loading spinner, brand chip.
 - `?city=<id>` URL param for shareable views.
 
+### Known issues (0.1.x demo)
+
+- Minato (32k buildings) and Kamakura (69k) sometimes load with some
+  buildings rendered in raw 3D Tiles material instead of styled. Suspected
+  race between AutoFit camera reframing and 3D Tiles LOD eviction causing
+  rebuildTile to skip patching on re-loaded meshes. Chiyoda always renders
+  correctly. Fix tracked for 0.2.
+
 ### Plan-conformance fixes (post-review)
 
 - Extracted `core/TileLifecycle.ts` with `canTransition()` state-machine helper.

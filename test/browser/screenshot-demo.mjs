@@ -7,7 +7,7 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 await page.goto('https://plateau-r3f-demo.pages.dev/', { waitUntil: 'domcontentloaded' });
-await page.waitForTimeout(35000);
+await page.waitForTimeout(60000);
 const out = '/tmp/live-demo.png';
 await page.screenshot({ path: out });
 const { data, info } = await sharp(out).raw().toBuffer({ resolveWithObject: true });

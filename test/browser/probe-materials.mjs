@@ -8,8 +8,9 @@ page.on('console', (m) => {
   if (m.type() === 'error' || m.type() === 'warning') console.log(`${m.type()}: ${m.text().slice(0, 200)}`);
 });
 page.on('pageerror', (e) => console.log('pageerror:', e.message));
-await page.goto('https://plateau-r3f-demo.pages.dev/', { waitUntil: 'domcontentloaded' });
-await page.waitForTimeout(30000);
+const target = process.env.URL ?? 'https://plateau-r3f-demo.pages.dev/';
+await page.goto(target, { waitUntil: 'domcontentloaded' });
+await page.waitForTimeout(45000);
 
 const info = await page.evaluate(() => {
   const dbg = (window).__plateauDebug;

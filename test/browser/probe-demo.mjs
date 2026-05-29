@@ -16,7 +16,8 @@ page.on('response', (r) => {
   if (u.includes('r2.dev')) reqs.push(`${r.status()} ${u.slice(u.indexOf('r2.dev')+7)}`);
 });
 page.on('requestfailed', (r) => fails.push(`${r.failure()?.errorText} ${r.url().slice(0, 100)}`));
-await page.goto('https://plateau-r3f-demo.pages.dev/', { waitUntil: 'domcontentloaded' });
+const target = process.env.URL ?? 'https://plateau-r3f-demo.pages.dev/';
+await page.goto(target, { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(45000);
 console.log('=== unique URL patterns (deduped by prefix) ===');
 const seen = new Set();
