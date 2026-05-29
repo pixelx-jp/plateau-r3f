@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: pack dry-run
+        run: npm pack --dry-run
+      - name: reject AI-assistant scratch in tree
+        run: |
+          BAD=$(git ls-files | grep -E '^(\.claude|CLAUDE\.md|\.cursor|\.cursorrules|\.aider|\.continue|\.codeium|\.windsurf|.*\.local$)' || true)
+          if [ -n "$BAD" ]; then
+            echo "✘ AI-assistant scratch must never be committed:"
+            echo "$BAD"
+            exit 1
+          fi
+      - name: reject scratch in published pack
+        run: |
+          BAD=$(npm pack --dry-run --json | node -e "
+            const m = JSON.parse(require('fs').readFileSync(0,'utf8'))[0];
+            const re = /^(\\.claude|CLAUDE\\.md|\\.cursor|\\.cursorrules|\\.aider|\\.continue|\\.codeium|\\.windsurf|.*\\.local$)/;
+            const hits = m.files.filter(f => re.test(f.path));
+            if (hits.length) { console.log(hits.map(h=>h.path).join('\n')); process.exit(0); }
+          ")
+          if [ -n "$BAD" ]; then
+            echo "✘ AI-assistant scratch would be published:"
+            echo "$BAD"
+            exit 1
+          fi

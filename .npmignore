@@ -1,0 +1,28 @@
+node_modules
+.vite
+test
+examples
+docs
+.github
+*.tsbuildinfo
+tsup.config.ts
+vitest.config.ts
+.DS_Store
+*.log
+coverage
+
+# AI assistant scratch — never publish to npm
+.claude/
+.claude*
+CLAUDE.md
+.cursor/
+.cursorrules
+.aider*
+.continue/
+.codeium*
+.windsurf/
+
+# Local secrets
+.env
+.env.*
+*.local

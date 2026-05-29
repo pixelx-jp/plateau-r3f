@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Vite
+.vite/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Tests
+coverage/
+test/visual/diff/
+test/visual/*.current.png
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+*.local
+
+# Plateau data (artifacts go to a CDN, never into the repo)
+out_*/
+plateau-data/
+
+# ───────────────────────────────────────────────────────────────
+# AI assistant / IDE scratch — MUST NEVER be committed to OSS repo.
+# These often contain conversation transcripts, internal notes, or
+# environment paths that leak proprietary context.
+# ───────────────────────────────────────────────────────────────
+.claude/
+**/.claude/
+.claude*
+CLAUDE.md
+.cursor/
+.cursorrules
+.aider*
+.continue/
+.codeium*
+.github-copilot*
+.windsurf/

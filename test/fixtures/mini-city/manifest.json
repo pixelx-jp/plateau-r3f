@@ -1,0 +1,19 @@
+{
+  "attribution": "© Test Fixture",
+  "tool": "plateau-bridge",
+  "tool_version": "0.0.0-test",
+  "generated_at": "2026-01-01T00:00:00Z",
+  "city_code": "00000",
+  "city_name": "mini-city",
+  "dataset_year": 2026,
+  "n_buildings": 2,
+  "datasets": ["plateau-test-mini-bldg"],
+  "sources": {
+    "plateau-test-mini-bldg": {
+      "source_id": "plateau-test-mini-bldg",
+      "dataset_id": "plateau-test-mini-bldg",
+      "year": 2026,
+      "url": "https://example.com/test.zip"
+    }
+  }
+}

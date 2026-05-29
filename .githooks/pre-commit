@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Defense-in-depth: block AI-assistant scratch from being committed
+# even if .gitignore is bypassed (e.g. `git add -f`).
+set -e
+
+BLOCKED='^(\.claude(/|$)|CLAUDE\.md$|\.cursor(/|$)|\.cursorrules$|\.aider|\.continue(/|$)|\.codeium|\.windsurf(/|$)|\.env$|\.env\.|.*\.local$)'
+
+bad=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "$BLOCKED" || true)
+if [ -n "$bad" ]; then
+  echo "✘ pre-commit: refusing to commit AI-assistant scratch / secrets:"
+  echo "$bad" | sed 's/^/    /'
+  echo "  (see .gitignore — these paths are excluded by policy)"
+  exit 1
+fi
