@@ -22,6 +22,11 @@
 </p>
 
 <p align="center">
+  <b><a href="https://plateau-r3f-demo.pages.dev/">▶ Live demo</a></b> &nbsp;·&nbsp;
+  <a href="https://pixelx-jp.github.io/plateau-r3f/">Docs</a>
+</p>
+
+<p align="center">
   <img src=".github/assets/preview-height-flood.png" width="720" alt="Chiyoda with height colorBy + river flood hazard overlay" />
   <br/>
   <sub>Chiyoda — <code>colorBy="height"</code> + <code>&lt;HazardLayer type="river_flood" /&gt;</code></sub>

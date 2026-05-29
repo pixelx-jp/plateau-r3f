@@ -86,6 +86,6 @@ export default defineConfig({
     alias: {
       '@plateau/r3f': path.resolve(__dirname, '../../src/index.ts'),
     },
-    dedupe: ['three', 'react', 'react-dom'],
+    dedupe: ['three', 'react', 'react-dom', '@react-three/fiber'],
   },
 });

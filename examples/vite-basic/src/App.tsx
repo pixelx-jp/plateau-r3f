@@ -5,6 +5,7 @@ import { OrbitControls } from '@react-three/drei';
 import {
   Plateau,
   HazardLayer,
+  type ArtifactResolver,
   type BuiltinColorBy,
   type HazardType,
   type PlateauRuntimeApi,
@@ -16,7 +17,31 @@ function DebugBridge() {
   return null;
 }
 
-const BASE_URL = '/plateau-data';
+// In dev, vite middleware proxies /plateau-data → local plateau-core/out_*.
+// In production (deployed demo), point at the R2 bucket where chiyoda's
+// artifacts are at the bucket root (no /city/ prefix).
+const FLAT_BASE_URL =
+  (import.meta as unknown as { env: Record<string, string> }).env.VITE_PLATEAU_FLAT_BASE_URL;
+const BASE_URL =
+  (import.meta as unknown as { env: Record<string, string> }).env.VITE_PLATEAU_BASE_URL ??
+  '/plateau-data';
+
+// Custom resolver for the demo: when FLAT_BASE_URL is set, ignore the
+// city argument and serve directly from the bucket root.
+const flatResolver: ArtifactResolver | undefined = FLAT_BASE_URL
+  ? {
+      resolve() {
+        const b = FLAT_BASE_URL!.replace(/\/$/, '');
+        return {
+          manifestUrl: `${b}/manifest.json`,
+          tilesetUrl: `${b}/3dtiles/tileset.json`,
+          tileIndexUrl: `${b}/tile_index.json`,
+          pmtilesUrl: `${b}/buildings.pmtiles`,
+        };
+      },
+    }
+  : undefined;
+
 const COLOR_BYS: BuiltinColorBy[] = ['year_built', 'structure', 'height'];
 const HAZARDS: HazardType[] = ['river_flood', 'tsunami', 'storm_surge', 'landslide'];
 
@@ -97,7 +122,13 @@ export default function App() {
         <DebugBridge />
         <ambientLight intensity={0.6} />
         <directionalLight position={[1000, 2000, 500]} intensity={1.0} />
-        <Plateau city={city} baseUrl={BASE_URL} colorBy={colorBy} onReady={setRuntime}>
+        <Plateau
+          city={city}
+          baseUrl={BASE_URL}
+          resolver={flatResolver}
+          colorBy={colorBy}
+          onReady={setRuntime}
+        >
           {hazard !== 'none' && <HazardLayer type={hazard} opacity={0.6} />}
         </Plateau>
         <AutoFitCamera runtime={runtime} />

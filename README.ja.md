@@ -22,6 +22,11 @@
 </p>
 
 <p align="center">
+  <b><a href="https://plateau-r3f-demo.pages.dev/">▶ ライブデモ</a></b> &nbsp;·&nbsp;
+  <a href="https://pixelx-jp.github.io/plateau-r3f/">ドキュメント</a>
+</p>
+
+<p align="center">
   <img src=".github/assets/preview-height-flood.png" width="720" alt="千代田区を高さでカラーリング、洪水ハザードを重ねた表示" />
   <br/>
   <sub>千代田区 — <code>colorBy="height"</code> + <code>&lt;HazardLayer type="river_flood" /&gt;</code></sub>
