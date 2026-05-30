@@ -26,6 +26,19 @@
 - Polished UI: glassmorphism control panel (city / colorBy / hazard), loading spinner, brand chip.
 - `?city=<id>` URL param for shareable views.
 
+### Live demo refresh
+
+- All 29 PLATEAU cities now in the city switcher (Tokyo 23 wards +
+  Fukuoka / Kamakura / Nagoya / Osaka / Sapporo / Yokohama). All artifacts
+  hosted on Cloudflare R2 (~65 GB).
+- Granular loading phases (manifest → tile_index → tileset → tiles →
+  styles → shading → ready), visible in the boot overlay and afterwards
+  in the controls panel until ready.
+- Share button copies the current URL; `city` / `colorBy` / `hazard`
+  state syncs to query params for shareable deep links.
+- Color legend inside the panel: linear gradients for height / year_built
+  / flood depth, categorical swatches for structure / landslide.
+
 ### 0.1.3 — Bounded auto-retry from rebuildTile finally
 
 - The visibility-driven retry from 0.1.1 only fires on the *transition*
