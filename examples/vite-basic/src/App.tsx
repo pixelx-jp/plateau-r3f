@@ -10,6 +10,7 @@ import {
   type HazardType,
   type PlateauRuntimeApi,
 } from '@yodolabs/plateau-r3f';
+import { ColorLegend } from './ColorLegend';
 
 function DebugBridge() {
   const { scene, camera, gl } = useThree();
@@ -18,8 +19,8 @@ function DebugBridge() {
 }
 
 // In dev, vite middleware proxies /plateau-data → local plateau-core/out_*.
-// In production (deployed demo), point at the R2 bucket. Chiyoda lives at the
-// bucket root (legacy); other cities at /<city>/.
+// In production, point at the R2 bucket. chiyoda lives at the bucket root
+// (legacy); other cities at /<city>/.
 const FLAT_BASE_URL =
   (import.meta as unknown as { env: Record<string, string> }).env.VITE_PLATEAU_FLAT_BASE_URL;
 const BASE_URL =
@@ -48,7 +49,6 @@ interface CityDef {
 }
 
 const CITIES: CityDef[] = [
-  // Tokyo 23 wards (alphabetical English)
   { id: 'adachi', label: 'Adachi · 足立' },
   { id: 'arakawa', label: 'Arakawa · 荒川' },
   { id: 'bunkyo', label: 'Bunkyō · 文京' },
@@ -72,7 +72,6 @@ const CITIES: CityDef[] = [
   { id: 'sumida', label: 'Sumida · 墨田' },
   { id: 'taito', label: 'Taitō · 台東' },
   { id: 'toshima', label: 'Toshima · 豊島' },
-  // Other major cities
   { id: 'fukuoka', label: 'Fukuoka · 福岡' },
   { id: 'kamakura', label: 'Kamakura · 鎌倉' },
   { id: 'nagoya', label: 'Nagoya · 名古屋' },
@@ -96,10 +95,35 @@ const HAZARDS: { id: HazardType | 'none'; label: string }[] = [
   { id: 'landslide', label: 'Landslide' },
 ];
 
-function readCity(): string {
-  const params = new URLSearchParams(window.location.search);
-  const c = params.get('city');
-  return CITIES.some((x) => x.id === c) ? c! : 'chiyoda';
+type LoadPhase =
+  | 'manifest'
+  | 'tile_index'
+  | 'tileset'
+  | 'tiles'
+  | 'styles'
+  | 'shading'
+  | 'ready';
+
+const PHASE_LABELS: Record<LoadPhase, string> = {
+  manifest: 'Fetching manifest',
+  tile_index: 'Reading tile index',
+  tileset: 'Loading 3D tileset',
+  tiles: 'Streaming 3D tiles',
+  styles: 'Decoding attribute tables',
+  shading: 'Patching shaders',
+  ready: '',
+};
+
+function parseInitial(): { city: string; colorBy: BuiltinColorBy; hazard: HazardType | 'none' } {
+  const p = new URLSearchParams(window.location.search);
+  const city = p.get('city');
+  const cb = p.get('colorBy') as BuiltinColorBy | null;
+  const hz = p.get('hazard') as HazardType | 'none' | null;
+  return {
+    city: CITIES.some((x) => x.id === city) ? city! : 'chiyoda',
+    colorBy: COLOR_BYS.some((x) => x.id === cb) ? cb! : 'height',
+    hazard: HAZARDS.some((x) => x.id === hz) ? hz! : 'river_flood',
+  };
 }
 
 function AutoFitCamera({ runtime }: { runtime: PlateauRuntimeApi | null }) {
@@ -142,28 +166,112 @@ function AutoFitCamera({ runtime }: { runtime: PlateauRuntimeApi | null }) {
   return null;
 }
 
-function hideLoadingSoon() {
-  const el = document.getElementById('loading');
-  if (!el) return;
-  // Delay a beat so the canvas has a chance to render at least one frame.
-  setTimeout(() => el.classList.add('hidden'), 600);
-}
-
 export default function App() {
-  const [colorBy, setColorBy] = useState<BuiltinColorBy>('height');
-  const [hazard, setHazard] = useState<HazardType | 'none'>('river_flood');
-  const [city, setCity] = useState<string>(readCity());
+  const initial = useMemo(parseInitial, []);
+  const [colorBy, setColorBy] = useState<BuiltinColorBy>(initial.colorBy);
+  const [hazard, setHazard] = useState<HazardType | 'none'>(initial.hazard);
+  const [city, setCity] = useState<string>(initial.city);
   const [runtime, setRuntime] = useState<PlateauRuntimeApi | null>(null);
+  const [phase, setPhase] = useState<LoadPhase>('manifest');
+  const [shareTip, setShareTip] = useState<string>('');
 
   const resolver = useMemo(() => makeR2Resolver(city), [city]);
 
-  // Update URL when city changes so it's shareable.
+  // Reflect all state in URL so it's shareable.
   useEffect(() => {
     const url = new URL(window.location.href);
-    if (city === 'chiyoda') url.searchParams.delete('city');
-    else url.searchParams.set('city', city);
+    const setDefault = (k: string, v: string, def: string) => {
+      if (v === def) url.searchParams.delete(k);
+      else url.searchParams.set(k, v);
+    };
+    setDefault('city', city, 'chiyoda');
+    setDefault('colorBy', colorBy, 'height');
+    setDefault('hazard', hazard, 'river_flood');
     window.history.replaceState({}, '', url.toString());
-  }, [city]);
+  }, [city, colorBy, hazard]);
+
+  // Track loading phases via fetch interception.
+  useEffect(() => {
+    setPhase('manifest');
+    const orig = window.fetch.bind(window);
+    let firstStyle = false;
+    let firstGlb = false;
+    window.fetch = async (...args: Parameters<typeof fetch>) => {
+      const u = args[0];
+      const url = typeof u === 'string' ? u : u instanceof URL ? u.toString() : (u as Request).url ?? '';
+      if (url.endsWith('tile_index.json')) setPhase((p) => (p === 'manifest' ? 'tile_index' : p));
+      else if (url.endsWith('tileset.json')) setPhase((p) => (p === 'manifest' || p === 'tile_index' ? 'tileset' : p));
+      else if (url.endsWith('.glb') && !firstGlb) {
+        firstGlb = true;
+        setPhase((p) => (p !== 'ready' && p !== 'shading' && p !== 'styles' ? 'tiles' : p));
+      } else if (url.endsWith('.arrow') && !firstStyle) {
+        firstStyle = true;
+        setPhase((p) => (p !== 'ready' && p !== 'shading' ? 'styles' : p));
+      }
+      return orig(...args);
+    };
+    return () => {
+      window.fetch = orig;
+    };
+  }, [city, resolver]);
+
+  // Promote to "shading" / "ready" via runtime observation.
+  useEffect(() => {
+    if (!runtime) return;
+    let cancelled = false;
+    let stableTicks = 0;
+    let lastCount = 0;
+    const id = setInterval(() => {
+      if (cancelled) return;
+      const visible = runtime.queryVisibleBuildings();
+      if (visible.length === 0) return;
+      setPhase((p) => (p === 'ready' || p === 'shading' ? p : 'shading'));
+      if (visible.length === lastCount) stableTicks++;
+      else stableTicks = 0;
+      lastCount = visible.length;
+      if (stableTicks >= 2) {
+        setPhase('ready');
+        clearInterval(id);
+      }
+    }, 1500);
+    const fallback = setTimeout(() => {
+      setPhase('ready');
+      clearInterval(id);
+    }, 45_000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      clearTimeout(fallback);
+    };
+  }, [runtime]);
+
+  // Hide the boot loading overlay once we declare ready.
+  useEffect(() => {
+    const el = document.getElementById('loading');
+    if (!el) return;
+    if (phase === 'ready') el.classList.add('hidden');
+    else el.classList.remove('hidden');
+  }, [phase]);
+
+  // Show the phase label on the boot overlay while it's still visible.
+  useEffect(() => {
+    const lbl = document.querySelector('#loading .label');
+    if (lbl) lbl.textContent = phase === 'ready' ? '' : PHASE_LABELS[phase];
+  }, [phase]);
+
+  const shareUrl = () => {
+    const url = window.location.href;
+    void navigator.clipboard.writeText(url).then(
+      () => {
+        setShareTip('Link copied');
+        setTimeout(() => setShareTip(''), 1800);
+      },
+      () => {
+        setShareTip('Copy failed');
+        setTimeout(() => setShareTip(''), 1800);
+      },
+    );
+  };
 
   return (
     <>
@@ -174,7 +282,13 @@ export default function App() {
       </div>
 
       <div className="panel">
-        <h2>Demo controls</h2>
+        <div className="panel-head">
+          <h2>Demo controls</h2>
+          <button className="share" onClick={shareUrl} title="Copy shareable URL">
+            {shareTip || 'Share'}
+          </button>
+        </div>
+
         <div className="row">
           <label htmlFor="city">City</label>
           <select id="city" value={city} onChange={(e) => setCity(e.target.value)}>
@@ -213,12 +327,18 @@ export default function App() {
             ))}
           </select>
         </div>
+
+        <ColorLegend colorBy={colorBy} hazard={hazard} />
+
+        {phase !== 'ready' && (
+          <div className="phase">
+            <span className="phase-dot" />
+            {PHASE_LABELS[phase]}…
+          </div>
+        )}
       </div>
 
-      <Canvas
-        camera={{ position: [1500, 1500, 1500], near: 1, far: 1_000_000, fov: 50 }}
-        onCreated={hideLoadingSoon}
-      >
+      <Canvas camera={{ position: [1500, 1500, 1500], near: 1, far: 1_000_000, fov: 50 }}>
         <DebugBridge />
         <ambientLight intensity={0.6} />
         <directionalLight position={[1000, 2000, 500]} intensity={1.0} />

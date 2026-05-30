@@ -73,13 +73,61 @@
         font-size: 13px;
       }
       .panel h2 {
-        margin: 0 0 10px;
+        margin: 0;
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--muted);
       }
+      .panel .panel-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin: 0 0 10px;
+      }
+      .panel .share {
+        background: rgba(92, 200, 255, 0.1);
+        color: var(--accent);
+        border: 1px solid rgba(92, 200, 255, 0.25);
+        border-radius: 6px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-family: inherit;
+        cursor: pointer;
+        letter-spacing: 0.02em;
+        transition: background 0.15s ease, border-color 0.15s ease;
+      }
+      .panel .share:hover {
+        background: rgba(92, 200, 255, 0.18);
+        border-color: rgba(92, 200, 255, 0.4);
+      }
+      .panel .share:active { transform: translateY(1px); }
+      .panel .legend {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid var(--panel-border);
+      }
+      .panel .legend-section { margin-top: 8px; }
+      .panel .legend-section:first-child { margin-top: 0; }
+      .panel .legend-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .panel .phase {
+        margin-top: 12px; padding-top: 10px;
+        border-top: 1px solid var(--panel-border);
+        display: flex; align-items: center; gap: 8px;
+        font-size: 11px; color: var(--muted);
+      }
+      .panel .phase-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--accent);
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
       .panel .row {
         display: flex; align-items: center; justify-content: space-between;
         gap: 12px;
