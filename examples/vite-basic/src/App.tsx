@@ -48,9 +48,37 @@ interface CityDef {
 }
 
 const CITIES: CityDef[] = [
+  // Tokyo 23 wards (alphabetical English)
+  { id: 'adachi', label: 'Adachi · 足立' },
+  { id: 'arakawa', label: 'Arakawa · 荒川' },
+  { id: 'bunkyo', label: 'Bunkyō · 文京' },
   { id: 'chiyoda', label: 'Chiyoda · 千代田' },
+  { id: 'chuo', label: 'Chūō · 中央' },
+  { id: 'edogawa', label: 'Edogawa · 江戸川' },
+  { id: 'itabashi', label: 'Itabashi · 板橋' },
+  { id: 'katsushika', label: 'Katsushika · 葛飾' },
+  { id: 'kita', label: 'Kita · 北' },
+  { id: 'koto', label: 'Kōtō · 江東' },
+  { id: 'meguro', label: 'Meguro · 目黒' },
   { id: 'minato', label: 'Minato · 港' },
+  { id: 'nakano', label: 'Nakano · 中野' },
+  { id: 'nerima', label: 'Nerima · 練馬' },
+  { id: 'ota', label: 'Ōta · 大田' },
+  { id: 'setagaya', label: 'Setagaya · 世田谷' },
+  { id: 'shibuya', label: 'Shibuya · 渋谷' },
+  { id: 'shinagawa', label: 'Shinagawa · 品川' },
+  { id: 'shinjuku', label: 'Shinjuku · 新宿' },
+  { id: 'suginami', label: 'Suginami · 杉並' },
+  { id: 'sumida', label: 'Sumida · 墨田' },
+  { id: 'taito', label: 'Taitō · 台東' },
+  { id: 'toshima', label: 'Toshima · 豊島' },
+  // Other major cities
+  { id: 'fukuoka', label: 'Fukuoka · 福岡' },
   { id: 'kamakura', label: 'Kamakura · 鎌倉' },
+  { id: 'nagoya', label: 'Nagoya · 名古屋' },
+  { id: 'osaka', label: 'Osaka · 大阪' },
+  { id: 'sapporo', label: 'Sapporo · 札幌' },
+  { id: 'yokohama', label: 'Yokohama · 横浜' },
 ];
 
 const COLOR_BYS: { id: BuiltinColorBy; label: string }[] = [
