@@ -63,11 +63,15 @@ interface TileEntry {
   handle: TileRuntimeHandle;
   colorTexture?: TileColorTexture;
   styleVersion: number;
-  /** True once rebuildTile finishes successfully or terminally fails. */
+  /** Permanent failure (style 404 etc) — no further rebuilds attempted. */
   terminallyFailed?: boolean;
   /** True while a rebuildTile is in flight — prevents duplicate awaiters. */
   rebuildInFlight?: boolean;
+  /** Counter for bounded auto-retry from rebuildTile's finally block. */
+  autoRetryCount?: number;
 }
+
+const MAX_AUTO_RETRIES = 3;
 
 export interface PlateauRuntime extends PlateauRuntimeApi {
   start(): Promise<void>;
@@ -310,6 +314,30 @@ export async function createPlateauRuntime(
       bumpColorPlanVersion();
     } finally {
       entry.rebuildInFlight = false;
+      // Bounded auto-retry: if this rebuild bailed (no colorTexture set)
+      // while the tile is still alive, visible, and not terminally failed,
+      // queue one more attempt. Without this, a rebuild that lost the
+      // tileAlive race mid-flight would leave the tile unstyled until a
+      // hide→visible toggle (which may never happen).
+      if (
+        !entry.colorTexture &&
+        !entry.terminallyFailed &&
+        tileAlive(entry, uri) &&
+        visibleUris.has(uri) &&
+        (entry.autoRetryCount ?? 0) < MAX_AUTO_RETRIES
+      ) {
+        entry.autoRetryCount = (entry.autoRetryCount ?? 0) + 1;
+        // Defer one microtask so the recursive call doesn't deepen the stack
+        // and any pending tile_alive flips have a chance to settle.
+        queueMicrotask(() => {
+          if (!tileAlive(entry, uri)) return;
+          void rebuildTile(entry);
+        });
+      } else if (entry.colorTexture) {
+        // Reset the counter on success so future renormalization (e.g.
+        // colorBy change) starts with a fresh retry budget.
+        entry.autoRetryCount = 0;
+      }
     }
   }
 

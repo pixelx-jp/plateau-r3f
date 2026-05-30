@@ -26,6 +26,16 @@
 - Polished UI: glassmorphism control panel (city / colorBy / hazard), loading spinner, brand chip.
 - `?city=<id>` URL param for shareable views.
 
+### 0.1.3 — Bounded auto-retry from rebuildTile finally
+
+- The visibility-driven retry from 0.1.1 only fires on the *transition*
+  to visible. If a `rebuildTile` lost a `tileAlive` race mid-flight
+  while the tile stayed visible, no further event fired to trigger
+  another attempt. `rebuildTile`'s `finally` block now requeues one
+  more attempt (up to `MAX_AUTO_RETRIES=3`) when the rebuild bailed
+  without setting `colorTexture` and the tile is still alive + visible
+  + not terminally failed. Counter resets on success.
+
 ### 0.1.2 — Robust rebuild gating + larger style cache
 
 - Replaced `entry.handle.state`-based gating in `rebuildTile` with
