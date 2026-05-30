@@ -1,6 +1,6 @@
 # Artifacts layout
 
-`baseUrl` is a directory whose contents match what `plateau-core` produces:
+`baseUrl` is a directory whose contents match what [`plateau-bridge`](https://github.com/pixelx-jp/plateau-bridge) produces:
 
 ```
 <baseUrl>/<city>/

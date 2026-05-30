@@ -73,7 +73,7 @@ export default function App() {
 }
 ```
 
-`baseUrl` は [`plateau-core`](#データパイプライン) が生成したアーティファクトのディレクトリを指します。ランタイムは PLATEAU の CMS には一切アクセスしません。
+`baseUrl` は [`plateau-bridge`](https://github.com/pixelx-jp/plateau-bridge) が生成したアーティファクトのディレクトリを指します（[データパイプライン](#データパイプライン)を参照）。ランタイムは PLATEAU の CMS には一切アクセスしません。
 
 ## ギャラリー
 
@@ -101,7 +101,7 @@ export default function App() {
 
 ## データパイプライン
 
-本ライブラリはブラウザ専用のクライアントライブラリであり、**データは同梱しません**。上流の [`plateau-core`](#)（Python）が PLATEAU の CityGML を以下のブラウザ向けアーティファクトに変換します。
+本ライブラリはブラウザ専用のクライアントライブラリであり、**データは同梱しません**。上流の [`plateau-bridge`](https://github.com/pixelx-jp/plateau-bridge)（Python · `pip install plateau-bridge`）が PLATEAU の CityGML を以下のブラウザ向けアーティファクトに変換します。
 
 ```
 out_<city>/
@@ -113,7 +113,9 @@ out_<city>/
   buildings.pmtiles
 ```
 
-このディレクトリを任意の静的ホスティング（S3 / R2 / GitHub Pages / 自社 CDN 等）に配置し、`<Plateau baseUrl="...">` で指してください。
+`plateau-bridge` は **29 都市のビルド済みバンドル**（東京 23 区 + 福岡 / 鎌倉 / 名古屋 / 大阪 / 札幌 / 横浜）も提供しているため、通常は自分で変換を実行する必要はありません。
+
+このディレクトリを任意の静的ホスティング（S3 / R2 / GitHub Pages / 自社 CDN 等）に配置し、`<Plateau baseUrl="...">` で指してください。[ライブデモ](https://plateau-r3f-demo.pages.dev) は 29 都市すべてを Cloudflare R2（約 65 GB）でホストしています。
 
 ## 出典 (Attribution)
 
@@ -137,7 +139,8 @@ useBuilding(key)?._attribution        // 建物ごとの出典情報
 | | |
 | --- | --- |
 | **ユニット + 統合テスト** | 48 件 すべて成功 |
-| **複数都市検証** | 千代田 / 港 / 鎌倉 / 福岡 / 名古屋 |
+| **複数都市検証** | デモで PLATEAU 29 都市すべて確認済 |
+| **E2E ユーザージャーニー** | Playwright 10 ステップ × chromium / firefox / webkit |
 | **ブラウザレンダリング検証** | headless Chromium + WebGL |
 | **ビジュアルリグレッション** | ベースライン 3 枚、ピクセル差分 5% 許容 |
 | **バンドルサイズ** | ESM 約 64 KB / CJS 約 68 KB / `.d.ts` 約 24 KB |

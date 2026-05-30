@@ -3,7 +3,7 @@ layout: home
 hero:
   name: '@yodolabs/plateau-r3f'
   text: PLATEAU 3D Tiles for React Three Fiber
-  tagline: Per-building attribute coloring, hazard layers, and PMTiles fallback — built on artifacts from plateau-core.
+  tagline: Per-building attribute coloring, hazard layers, and PMTiles fallback — built on artifacts from plateau-bridge.
   actions:
     - theme: brand
       text: Get started

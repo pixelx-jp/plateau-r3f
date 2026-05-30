@@ -73,7 +73,7 @@ export default function App() {
 }
 ```
 
-`baseUrl` should point to a directory of artifacts produced by [`plateau-core`](#data-pipeline). The library never calls the PLATEAU CMS at runtime.
+`baseUrl` should point to a directory of artifacts produced by [`plateau-bridge`](https://github.com/pixelx-jp/plateau-bridge) (see [Data pipeline](#data-pipeline)). The library never calls the PLATEAU CMS at runtime.
 
 ## Gallery
 
@@ -101,7 +101,7 @@ export default function App() {
 
 ## Data pipeline
 
-This is a pure browser library — it ships **no data**. The upstream [`plateau-core`](#) project (Python) converts PLATEAU's CityGML into browser-friendly artifacts:
+This is a pure browser library — it ships **no data**. The upstream [`plateau-bridge`](https://github.com/pixelx-jp/plateau-bridge) project (Python · `pip install plateau-bridge`) converts PLATEAU's CityGML into browser-friendly artifacts:
 
 ```
 out_<city>/
@@ -113,7 +113,9 @@ out_<city>/
   buildings.pmtiles
 ```
 
-Deploy that directory to any static host (S3, R2, GitHub Pages, your own CDN) and point `<Plateau baseUrl="...">` at it.
+`plateau-bridge` also ships **pre-built bundles for 29 cities** (Tokyo 23 wards + Fukuoka / Kamakura / Nagoya / Osaka / Sapporo / Yokohama), so you typically won't need to run the conversion yourself.
+
+Deploy that directory to any static host (S3, R2, GitHub Pages, your own CDN) and point `<Plateau baseUrl="...">` at it. Our [live demo](https://plateau-r3f-demo.pages.dev) hosts all 29 cities on Cloudflare R2 (~65 GB).
 
 ## Attribution
 
@@ -137,7 +139,8 @@ Minimum footer:
 | | |
 | --- | --- |
 | **Unit + integration tests** | 48 passing |
-| **Multi-city verification** | Chiyoda / Minato / Kamakura / Fukuoka / Nagoya |
+| **Multi-city verification** | All 29 PLATEAU cities live in demo |
+| **E2E user journey** | 10-step Playwright on chromium / firefox / webkit |
 | **Browser render check** | headless Chromium + WebGL |
 | **Visual regression** | 3 baseline shots, pixel-diff with 5% tolerance |
 | **Bundle** | ~64 KB ESM, ~68 KB CJS, ~24 KB `.d.ts` |
