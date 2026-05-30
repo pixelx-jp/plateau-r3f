@@ -158,6 +158,33 @@
       .attr .links { margin-top: 2px; }
       .attr .links a { color: var(--muted); }
       .attr .sep { margin: 0 6px; opacity: 0.4; }
+
+      /* Mobile: the fixed top-right panel collides with the brand chip and
+         can grow taller than a phone screen, so dock it to the bottom as a
+         scrollable full-width sheet and enlarge touch targets. */
+      @media (max-width: 720px) {
+        .brand { top: 10px; left: 10px; font-size: 12px; }
+        .brand .pkg { display: none; }
+        .panel {
+          top: auto; right: 8px; left: 8px;
+          bottom: 40px;
+          min-width: 0;
+          max-height: 45vh;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          border-radius: 12px;
+          padding: 14px 16px;
+        }
+        .panel .row { gap: 16px; margin: 12px 0; }
+        .panel select {
+          min-width: 0; flex: 1;
+          min-height: 44px;
+          font-size: 16px; /* prevents iOS zoom-on-focus */
+          padding: 8px 10px;
+        }
+        .panel .share { min-height: 36px; padding: 6px 14px; font-size: 12px; }
+        .attr { bottom: 8px; font-size: 10px; }
+      }
     </style>
   </head>
   <body>
