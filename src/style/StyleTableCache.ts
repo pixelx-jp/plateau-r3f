@@ -35,7 +35,10 @@ export interface StyleTableCache {
 }
 
 export function createStyleTableCache(opts: StyleTableCacheOptions): StyleTableCache {
-  const max = opts.max ?? 256;
+  // Large default. Wards like Chiyoda have ~1.6k tiles; Kamakura ~2.7k. With
+  // refCount pinning, visible tiles are safe past the cap; only background /
+  // off-screen tiles are eligible for eviction.
+  const max = opts.max ?? 4096;
   const releaseDelayMs = opts.releaseDelayMs ?? 5000;
 
   const lru = new LruCache<CacheEntry>({

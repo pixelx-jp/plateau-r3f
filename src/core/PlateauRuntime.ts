@@ -63,6 +63,10 @@ interface TileEntry {
   handle: TileRuntimeHandle;
   colorTexture?: TileColorTexture;
   styleVersion: number;
+  /** True once rebuildTile finishes successfully or terminally fails. */
+  terminallyFailed?: boolean;
+  /** True while a rebuildTile is in flight — prevents duplicate awaiters. */
+  rebuildInFlight?: boolean;
 }
 
 export interface PlateauRuntime extends PlateauRuntimeApi {
@@ -230,65 +234,83 @@ export async function createPlateauRuntime(
 
   async function rebuildTile(entry: TileEntry): Promise<void> {
     const uri = entry.handle.tile_content_uri;
-    if (entry.handle.state === 'featureIdMissing') return;
+    // Use entry-local flags rather than handle.state — visibility events
+    // overwrite state to 'visible'/'hidden' so it can't be used to gate
+    // terminal failure or in-flight detection.
+    if (entry.terminallyFailed) return;
+    if (entry.rebuildInFlight) return;
     if (!entry.handle.featureIdAttribute) return;
     if (!tileAlive(entry, uri)) return;
+    entry.rebuildInFlight = true;
     const planAtStart = plan;
-    entry.handle.state = 'styleRequested';
-    let table;
+    if (entry.handle.state !== 'visible' && entry.handle.state !== 'hidden') {
+      entry.handle.state = 'styleRequested';
+    }
     try {
-      table = await styleCache.get(uri);
-    } catch (cause) {
+      let table;
+      try {
+        table = await styleCache.get(uri);
+      } catch (cause) {
+        if (!tileAlive(entry, uri)) return;
+        entry.terminallyFailed = true;
+        if (entry.handle.state !== 'visible' && entry.handle.state !== 'hidden') {
+          entry.handle.state = 'featureIdMissing';
+        }
+        opts.onError?.({
+          code: 'style_load_failed',
+          message: `Failed to load style for ${uri}`,
+          cause,
+        });
+        computeFallback();
+        return;
+      }
       if (!tileAlive(entry, uri)) return;
-      entry.handle.state = 'featureIdMissing';
-      opts.onError?.({
-        code: 'style_load_failed',
-        message: `Failed to load style for ${uri}`,
-        cause,
+      // Drop result if a newer color plan superseded ours while we awaited.
+      if (entry.styleVersion >= planAtStart.version && entry.colorTexture) return;
+      if (entry.handle.state !== 'visible' && entry.handle.state !== 'hidden') {
+        entry.handle.state = 'styleLoaded';
+      }
+      if (entry.colorTexture) {
+        disposeTexture(entry.colorTexture.texture);
+        entry.colorTexture = undefined;
+      }
+      const colorTexture = buildTileColorTexture({
+        table,
+        colorBy: compiledColor,
+        layers: compiledLayers,
       });
-      computeFallback();
-      return;
+      if (!tileAlive(entry, uri)) {
+        disposeTexture(colorTexture.texture);
+        return;
+      }
+      entry.colorTexture = colorTexture;
+      entry.styleVersion = plan.version;
+      if (entry.handle.state !== 'visible' && entry.handle.state !== 'hidden') {
+        entry.handle.state = 'colorTextureReady';
+      }
+      for (const meshEntry of entry.handle.meshes) {
+        if (!meshEntry.featureIdAttribute) continue;
+        applyShaderPatch(meshEntry.mesh, {
+          featureIdAttribute: meshEntry.featureIdAttribute,
+          colorTexture,
+          opacity: plan.opacity,
+          cacheKeySalt,
+          extensions: shaderExtensions,
+          onUnsupported: (material) => {
+            opts.onError?.({
+              code: 'unknown',
+              message: `Material "${material.type}" is unsupported for plateau shader patch; tile ${uri} will not be styled.`,
+            });
+          },
+        });
+      }
+      if (entry.handle.state !== 'visible' && entry.handle.state !== 'hidden') {
+        entry.handle.state = 'shaderInjected';
+      }
+      bumpColorPlanVersion();
+    } finally {
+      entry.rebuildInFlight = false;
     }
-    if (!tileAlive(entry, uri)) return;
-    // Drop result if a newer color plan superseded ours while we awaited
-    // — the next setColorPlan() call will rebuild with the latest plan.
-    if (entry.styleVersion >= planAtStart.version && entry.colorTexture) return;
-    entry.handle.state = 'styleLoaded';
-    if (entry.colorTexture) {
-      disposeTexture(entry.colorTexture.texture);
-      entry.colorTexture = undefined;
-    }
-    const colorTexture = buildTileColorTexture({
-      table,
-      colorBy: compiledColor,
-      layers: compiledLayers,
-    });
-    if (!tileAlive(entry, uri)) {
-      // Tile was disposed while we were composing the texture.
-      disposeTexture(colorTexture.texture);
-      return;
-    }
-    entry.colorTexture = colorTexture;
-    entry.styleVersion = plan.version;
-    entry.handle.state = 'colorTextureReady';
-    for (const meshEntry of entry.handle.meshes) {
-      if (!meshEntry.featureIdAttribute) continue;
-      applyShaderPatch(meshEntry.mesh, {
-        featureIdAttribute: meshEntry.featureIdAttribute,
-        colorTexture,
-        opacity: plan.opacity,
-        cacheKeySalt,
-        extensions: shaderExtensions,
-        onUnsupported: (material) => {
-          opts.onError?.({
-            code: 'unknown',
-            message: `Material "${material.type}" is unsupported for plateau shader patch; tile ${uri} will not be styled.`,
-          });
-        },
-      });
-    }
-    entry.handle.state = 'shaderInjected';
-    bumpColorPlanVersion();
   }
 
   async function rebuildAll(): Promise<void> {
@@ -344,13 +366,14 @@ export async function createPlateauRuntime(
       // Resilient retry: if the tile reached "visible" without being styled
       // (e.g. an earlier rebuildTile bailed because tileAlive went false
       // mid-flight while the camera was reframing), trigger a fresh rebuild.
+      // Gates use entry-local flags so they survive visibility state writes.
       const entry = tiles.get(uri);
       if (
         entry &&
         entry.handle.featureIdAttribute &&
         !entry.colorTexture &&
-        entry.handle.state !== 'featureIdMissing' &&
-        entry.handle.state !== 'styleRequested'
+        !entry.terminallyFailed &&
+        !entry.rebuildInFlight
       ) {
         void rebuildTile(entry);
       }

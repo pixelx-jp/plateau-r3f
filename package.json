@@ -1,6 +1,6 @@
 {
   "name": "@yodolabs/plateau-r3f",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React Three Fiber library for PLATEAU 3D Tiles with attribute coloring and hazard layers",
   "license": "MIT",
   "author": "Yodo Labs <pan@yodolabs.jp> (https://yodolabs.jp)",

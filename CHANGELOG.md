@@ -26,6 +26,18 @@
 - Polished UI: glassmorphism control panel (city / colorBy / hazard), loading spinner, brand chip.
 - `?city=<id>` URL param for shareable views.
 
+### 0.1.2 — Robust rebuild gating + larger style cache
+
+- Replaced `entry.handle.state`-based gating in `rebuildTile` with
+  entry-local `terminallyFailed` / `rebuildInFlight` flags. Visibility
+  events write to `state` ('visible'/'hidden'), which previously could
+  clobber `'featureIdMissing'`/`'styleRequested'` and let permanent
+  failures silently retry on every hide→visible cycle, or stack duplicate
+  awaiters during LOD churn. (Found in code review.)
+- `StyleTableCache` default `max` raised 256 → 4096 to comfortably cover
+  large cities (Kamakura 2.7k tiles, Nagoya 22k). Visible tiles are
+  pinned by refCount; only off-screen entries are eligible for eviction.
+
 ### 0.1.1 — Resilient styling on big cities
 
 - Fix a race where `rebuildTile` could bail mid-flight (camera reframing
