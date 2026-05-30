@@ -43,6 +43,9 @@ pnpm-debug.log*
 out_*/
 plateau-data/
 
+# Internal drafts (launch copy, private notes — never committed)
+_internal/
+
 # ───────────────────────────────────────────────────────────────
 # AI assistant / IDE scratch — MUST NEVER be committed to OSS repo.
 # These often contain conversation transcripts, internal notes, or

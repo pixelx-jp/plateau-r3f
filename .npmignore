@@ -4,6 +4,7 @@ test
 examples
 docs
 .github
+_internal
 *.tsbuildinfo
 tsup.config.ts
 vitest.config.ts
